@@ -56,7 +56,7 @@ res_dict = {
 
 res_dict = res_dict['result'][0]['url']
 
-pprint('Кол-во символов: url({}),'.format(res_dict.get('character_count')),
+print('Кол-во символов: url({}),'.format(res_dict.get('character_count')),
       'title({}),'.format(res_dict['title'].get('character_count')),
       'meta description({}),'.format(res_dict['desc'].get('character_count')),
       'h1({})'.format(res_dict['h1'].get('character_count')))
