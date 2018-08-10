@@ -1,8 +1,5 @@
 from requests_html import HTMLSession
-import pymorphy2
 
-
-morph = pymorphy2.MorphAnalyzer()
 session = HTMLSession()
 
 url = ['https://www.dochkisinochki.ru/icatalog/categories/molochnye_smesi/']
@@ -59,7 +56,7 @@ res_dict = {
 
 res_dict = res_dict['result'][0]['url']
 
-print('Кол-во символов: url({}),'.format(res_dict.get('character_count')),
+pprint('Кол-во символов: url({}),'.format(res_dict.get('character_count')),
       'title({}),'.format(res_dict['title'].get('character_count')),
       'meta description({}),'.format(res_dict['desc'].get('character_count')),
       'h1({})'.format(res_dict['h1'].get('character_count')))
