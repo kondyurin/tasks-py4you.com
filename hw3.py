@@ -8,12 +8,14 @@ while True:
     try:
         domain_list = '.com'
         domain = input('Введите домен: ')
-        if domain_list not in domain:
+        if domain == 'exit':
+            break
+        elif domain_list not in domain:
             raise Exception("incorrect domain name")
     except Exception as e:
         domain = input('enter valid domain name')
     else:
-        token = '25bc234aa0bc85faba29358f67bc4400'
+        token = 'f0a9d28ab759a66858d08f95533f62cf'
         se = 'g_ua'
         page_size = 1
 
