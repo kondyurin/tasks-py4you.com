@@ -25,7 +25,10 @@ while True:
             if domain in item:
                 return item[0]
 
+    try:
+        a = get_domain_position(keyword, domain.replace('www.', ''))
+        print(f'Позиция по ключевому слову \"{keyword}\" домена {domain}: {a}')
+    except Exception as e:
+        print(e)
 
-    a = get_domain_position(keyword, domain.replace('www.', ''))
-    print(f'Позиция по ключевому слову \"{keyword}\" домена {domain}: {a}')
 
