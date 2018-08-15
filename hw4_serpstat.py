@@ -11,6 +11,12 @@ while True:
 
 
     def get_json_data(url, payload):
+
+        """
+        Функция делает запрос к API Serpstat и возвращает JSON
+
+        """
+
         session = HTMLSession()
         resp = session.get(url, params=payload)
         data = resp.json()
