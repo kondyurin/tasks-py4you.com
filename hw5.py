@@ -49,10 +49,10 @@ def write_data_to_csv(data):
             writer.writerow(row)
 
 
-res_lst = []
+if __name__ == '__main__':
+    res_lst = []
+    for item in get_data_from_csv():
+        res = get_pos_num(item, domain_input)
+        res_lst.append(res)
 
-for item in get_data_from_csv():
-    res = get_pos_num(item, domain_input)
-    res_lst.append(res)
-
-write_data_to_csv(res_lst)
+    write_data_to_csv(res_lst)
