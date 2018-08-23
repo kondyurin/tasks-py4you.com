@@ -17,9 +17,9 @@ class Database:
 
     def create_db(self):
         metadata = sa.MetaData()
-        engine = sa.create_engine(self.dsn)
-        metadata.bind = engine
-        domain = sa.Table(
+        self.engine = sa.create_engine(self.dsn)
+        metadata.bind = self.engine
+        self.domain = sa.Table(
             self.TABLE_NAME, metadata,
             sa.Column('id', sa.Integer, primary_key=True),
             sa.Column('domain', sa.String(255)),
@@ -30,11 +30,13 @@ class Database:
         )
         return metadata.create_all()
 
-    def execute(self, domain, item_values):
-        conn = sa.create_engine(self.dsn).connect()
-        query = domain.insert().values(**item_values)
+    def write_to_db(self, item_values):
+        conn = self.engine.connect()
+        query = self.domain.insert().values(**item_values)
         conn.execute(query)
 
 if __name__ == '__main__':
-    Database().create_db()
+    # Database().create_db()
+    dct = {'domain': 'asdasd.ru'}
+    res = Database().write_to_db(dct)
     print("DB successfully created!")
