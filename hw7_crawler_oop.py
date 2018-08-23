@@ -78,13 +78,11 @@ class Crawler:
         return self.url_visited
 
     def get_elem(self, url, urls_lst):
-        item_values = dict{}
         """
         На входе список пройденных url
         На выходе значения тегов
 
         """
-        conn = engine.connect()
 
         for item in urls_lst:
             html = self.get_data(item)
@@ -93,21 +91,14 @@ class Crawler:
             h1 = self.normalize_xpath_result(html.html.xpath('//h1/text()'))
             print(f'{item}: {title}, {desc}, {h1}')
             item_values = {
-                'title':title,
-                'description':desc,
-                'h1':h1,
-                'url':item,
-                'domain':url
+                'title': title,
+                'description': desc,
+                'h1': h1,
+                'url': item,
+                'domain': url
             }
-            query =
-            conn.execute(
-                # domain.insert().values(title=title,
-                #                        description=desc,
-                #                        h1=h1,
-                #                        url=item,
-                #                        domain=url),
-            )
-        conn.close()
+            self.db.write_to_db(item_values)
+
 
     def normalize_xpath_result(self, html_elem):
 

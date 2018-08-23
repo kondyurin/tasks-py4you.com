@@ -14,13 +14,11 @@ class Database:
         self.TABLE_NAME = 'kondyurin_crawler'
         self.connection = {'user': 'py4seo', 'database': 'library', 'host': '', 'password': ''}
         self.dsn = 'postgresql://{user}:{password}@{host}/{database}'.format(**self.connection)
-
-    def create_db(self):
-        metadata = sa.MetaData()
         self.engine = sa.create_engine(self.dsn)
-        metadata.bind = self.engine
+        self.metadata = sa.MetaData()
+        self.metadata.bind = self.engine
         self.domain = sa.Table(
-            self.TABLE_NAME, metadata,
+            self.TABLE_NAME, self.metadata,
             sa.Column('id', sa.Integer, primary_key=True),
             sa.Column('domain', sa.String(255)),
             sa.Column('url', sa.Text),
@@ -28,7 +26,9 @@ class Database:
             sa.Column('description', sa.Text),
             sa.Column('h1', sa.Text)
         )
-        return metadata.create_all()
+
+    def create_db(self):
+        return self.metadata.create_all()
 
     def write_to_db(self, item_values):
         conn = self.engine.connect()
@@ -37,6 +37,6 @@ class Database:
 
 if __name__ == '__main__':
     # Database().create_db()
-    dct = {'domain': 'asdasd.ru'}
-    res = Database().write_to_db(dct)
+    # dct = {'domain': 'asdasd.ru'}
+    # res = Database().write_to_db(dct)
     print("DB successfully created!")
