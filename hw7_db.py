@@ -30,9 +30,10 @@ class Database:
         )
         return metadata.create_all()
 
-    def execute(self):
+    def execute(self, domain, item_values):
         conn = sa.create_engine(self.dsn).connect()
-
+        query = domain.insert().values(**item_values)
+        conn.execute(query)
 
 if __name__ == '__main__':
     Database().create_db()
