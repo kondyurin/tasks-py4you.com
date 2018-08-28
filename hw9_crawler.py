@@ -100,19 +100,19 @@ def get_elem(domain_url, q):
             with locker:
                 scanned_urls.add(url)
 
-            if url in do_crawl(domain_url):
-                html = get_data(url)
-                title = normalize_xpath_result(html.html.xpath('//title/text()'))
-                desc = normalize_xpath_result(html.html.xpath('//meta[@name="description"]/@content'))
-                h1 = normalize_xpath_result(html.html.xpath('//h1/text()'))
-                print(f'{item}: {title}, {desc}, {h1}')
-                conn.execute(
-                    domain.insert().values(title=title,
-                                           description=desc,
-                                           h1=h1,
-                                           url=item,
-                                           domain=domain_url),
-                )
+            # if url in do_crawl(domain_url):
+            html = get_data(url)
+            title = normalize_xpath_result(html.html.xpath('//title/text()'))
+            desc = normalize_xpath_result(html.html.xpath('//meta[@name="description"]/@content'))
+            h1 = normalize_xpath_result(html.html.xpath('//h1/text()'))
+            print(f'{item}: {title}, {desc}, {h1}')
+            conn.execute(
+                domain.insert().values(title=title,
+                                       description=desc,
+                                       h1=h1,
+                                       url=item,
+                                       domain=domain_url),
+            )
 
         conn.close()
 
