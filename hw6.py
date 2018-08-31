@@ -53,8 +53,7 @@ def get_url_lst(data, url):
     return links_lst
 
 
-def do_crawl(url, depth=1, max_depth=1):
-
+def do_crawl(url, depth=1, max_depth=2):
     """
     На входе url, глубина прохода, макс глубина прохода вглубь
     На выходе список пройденных url

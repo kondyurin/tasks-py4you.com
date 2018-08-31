@@ -12,7 +12,7 @@ import sqlalchemy as sa
 class Database:
     def __init__(self):
         self.TABLE_NAME = 'kondyurin_crawler'
-        self.connection = {'user': 'py4seo', 'database': 'library', 'host': '', 'password': ''}
+        self.connection = {'user': 'py4seo', 'database': 'library', 'host': '46.30.164.249', 'password': 'PY1111forSEO'}
         self.dsn = 'postgresql://{user}:{password}@{host}/{database}'.format(**self.connection)
         self.engine = sa.create_engine(self.dsn)
         self.metadata = sa.MetaData()

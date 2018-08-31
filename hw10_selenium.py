@@ -1,6 +1,5 @@
 # Написать любой парсер с использованием селениума.
 
-
 import os
 import random
 from lxml import html
@@ -29,7 +28,7 @@ driver.get('https://web.archive.org/')
 search_elem = driver.find_element_by_xpath('//*[@id="react-wayback-search"]/div/div[1]/form/div[2]/div/input[1]')
 sleep(random.randint(1, 3))
 search_elem.send_keys(url)
-sleep(random.randint(7, 8))
+sleep(random.randint(7, 8))  # это надо заменить на ожидания ниже
 
 # driver.implicitly_wait(5)
 
@@ -53,6 +52,7 @@ createFolder('./screenshots/')
 
 for i, l in list(enumerate(res_lst[0:img_count])):
     driver.get(l)
-    driver.save_screenshot(f'./screenshots/{i+1}.png')
+    img_name = l.replace('https://web.archive.org/web/','')[:8]
+    driver.save_screenshot(f'./screenshots/{img_name}.png')
 
 

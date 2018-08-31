@@ -6,7 +6,9 @@
 
 from requests_html import HTMLSession
 from time import sleep
-from hw7_db import sa, Database
+from hw7_db import Database
+from queue import Queue
+from concurrent.futures import ThreadPoolExecutor
 
 
 class Crawler:
@@ -18,6 +20,7 @@ class Crawler:
                     '#', '?', '.pdf', '.doc', 'tel:']
         self.max_depth = 1
         self.db = Database()
+        self.q = Queue()  # очередь
 
     def get_data(self, url):
 
@@ -41,6 +44,7 @@ class Crawler:
         links_lst = []
         links = list(set(data.html.xpath('//a/@href')))  # ищем все ссылки и удаляем дубликаты
         for link in links:
+            # self.q.put(link)  # заполняем очередь
             if link and link != url and link not in links_lst and not any(word in link for word in self.excluded):
                 if link.startswith('http://') or link.startswith('https://') or link.startswith('www'):
                     links_lst.append(url)
@@ -64,6 +68,7 @@ class Crawler:
         self.db.create_db()
         self.max_depth = max_depth
         self.url_visited.add(url)  # очередь пройденных url , set
+        self.q.put(url)
 
         if depth > self.max_depth:
             return
@@ -83,7 +88,6 @@ class Crawler:
         На выходе значения тегов
 
         """
-
         for item in urls_lst:
             html = self.get_data(item)
             title = self.normalize_xpath_result(html.html.xpath('//title/text()'))
@@ -98,6 +102,10 @@ class Crawler:
                 'domain': url
             }
             self.db.write_to_db(item_values)
+
+        # executor = ThreadPoolExecutor(max_workers=10)
+        # for _ in range(10):
+        #     executor.submit()
 
 
     def normalize_xpath_result(self, html_elem):
@@ -114,11 +122,17 @@ class Crawler:
 
 
 if __name__ == '__main__':
+    # ccc = Crawler().q.qsize()
+    # print(ccc)
     while True:
         domain_url = input('Введите домен для анализа: ').strip()
         if domain_url[:7] == 'http://' or domain_url[:8] == 'https://':
             res = Crawler().do_crawl(domain_url)
-            abc = Crawler().get_elem(domain_url, res)
-            print(abc)
+            # abc = Crawler().get_elem(domain_url, res)
+            # print(abc)
+            executor = ThreadPoolExecutor(max_workers=20)
+            for _ in range(20):
+                executor.submit(worker, q)
+
         else:
             print('Введите протокол домена')

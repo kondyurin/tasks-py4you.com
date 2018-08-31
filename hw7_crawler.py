@@ -1,22 +1,15 @@
-# Задача:
-# Доделать все тот же многопоточный парсер, только можно без класса.
-# Просто на 2-х функциях: одна является обработчиком, именно она
-# работает многопоточно, а вторая - стартует потоки.
-
+# Написать парсер на функциях, без использования классов.
+# Аналог Скриминг Фрог Сео Спайдера. Вводишь домен, и
+# сканер лезет по всем страницам сайта.
+# При этом записывает в файл урл, тайтл, дескрипшен, н1.
+# И если находит дубль, помечает, что это дубль в файле.
 
 from requests_html import HTMLSession
 from time import sleep
-from hw9_db import domain, engine
-from threading import Lock
-from queue import Queue
-from concurrent.futures import ThreadPoolExecutor
+from hw7_db import sa, domain, engine
 
 
 url_visited = set()
-locker = Lock()
-scanned_urls = set()
-q = Queue()
-
 
 excluded = ['mailto:', 'favicon', '.ico',  # список стоп-слов для урл
             '.css', '.js', '.jpg',
@@ -83,39 +76,30 @@ def do_crawl(url, depth=1, max_depth=1):
     return url_visited
 
 
-def get_elem(domain_url, q):
+def get_elem(url, urls_lst):
+
+    conn = engine.connect()
+
     """
     На входе список пройденных url
     На выходе значения тегов
 
     """
-    # global scanned_urls
-    conn = engine.connect()
 
-    while not q.empty():
-
-        for item in list(q.queue):
-
-            url = q.get()
-            with locker:
-                scanned_urls.add(url)
-
-            # if url in do_crawl(domain_url):
-            html = get_data(url)
-            title = normalize_xpath_result(html.html.xpath('//title/text()'))
-            desc = normalize_xpath_result(html.html.xpath('//meta[@name="description"]/@content'))
-            h1 = normalize_xpath_result(html.html.xpath('//h1/text()'))
-            print(f'{item}: {title}, {desc}, {h1}')
-            conn.execute(
-                domain.insert().values(title=title,
-                                       description=desc,
-                                       h1=h1,
-                                       url=item,
-                                       domain=domain_url),
-            )
-            scanned_urls.add(url)
-        conn.close()
-
+    for item in urls_lst:
+        html = get_data(item)
+        title = normalize_xpath_result(html.html.xpath('//title/text()'))
+        desc = normalize_xpath_result(html.html.xpath('//meta[@name="description"]/@content'))
+        h1 = normalize_xpath_result(html.html.xpath('//h1/text()'))
+        print(f'{item}: {title}, {desc}, {h1}')
+        conn.execute(
+            domain.insert().values(title=title,
+                                   description=desc,
+                                   h1=h1,
+                                   url=item,
+                                   domain=url),
+        )
+    conn.close()
 
 def normalize_xpath_result(html_elem):
 
@@ -130,28 +114,12 @@ def normalize_xpath_result(html_elem):
     return ''
 
 
-def main():
-    domain_url = input('Введите домен для анализа: ').strip()
-    res = do_crawl(domain_url)
-    for url in res:
-        q.put(url)
-        scanned_urls.add(url)
-    with ThreadPoolExecutor(max_workers=3) as ex:
-        for _ in range(3):
-            ex.submit(get_elem, domain_url, q)
-
-    # abc = get_elem(domain_url, res)
-    # print(abc)
-
-
 if __name__ == '__main__':
-    main()
-
-    # while True:
-    #     if domain_url[:7] == 'http://' or domain_url[:8] == 'https://':
-    #         res = do_crawl(domain_url)
-    #         abc = get_elem(domain_url, res)
-    #         print(abc)
-    #     else:
-    #         print('Введите протокол домена')
-
+    while True:
+        domain_url = input('Введите домен для анализа: ').strip()
+        if domain_url[:7] == 'http://' or domain_url[:8] == 'https://':
+            res = do_crawl(domain_url)
+            abc = get_elem(domain_url, res)
+            print(abc)
+        else:
+            print('Введите протокол домена')
