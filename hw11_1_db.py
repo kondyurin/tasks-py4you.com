@@ -5,7 +5,7 @@ TABLE_NAME = 'kondyurin_crawler_asyncio'
 
 
 metadata = sa.MetaData()
-connection = {'user': 'py4seo', 'database': 'library', 'host': '', 'password': ''}
+connection = {'user': 'py4seo', 'database': 'library', 'host': '46.30.164.249', 'password': 'PY1111forSEO'}
 
 dsn = 'postgresql://{user}:{password}@{host}/{database}'.format(**connection)
 
@@ -19,7 +19,8 @@ domain = sa.Table(
     sa.Column('url', sa.Text),
     sa.Column('title', sa.Text),
     sa.Column('description', sa.Text),
-    sa.Column('h1', sa.Text)
+    sa.Column('h1', sa.Text),
+    sa.Column('link_level', sa.Integer)
 )
 
 if __name__ == '__main__':

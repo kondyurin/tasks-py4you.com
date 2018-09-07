@@ -3,7 +3,6 @@
 # Аналог Screeming Frog SEO Spider, сохраняющий в базу url,
 # title, description, h1, link_level, in_links_count, out_links_count.
 
-import aiopg
 import aiohttp
 import asyncio
 from lxml import html
@@ -11,13 +10,14 @@ from hw11_1_db import domain, engine
 from concurrent.futures import ThreadPoolExecutor
 
 
-url = 'https://www.mvideo.ru/'
+url = 'https://www.detmir.ru/'
 scaned_urls = set()
-loop = asyncio.get_event_loop()
+
 executor = ThreadPoolExecutor(max_workers=10)
 
 
 async def worker(q):
+    depth = 0
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
         while q.qsize() > 0:
             u = await q.get()
@@ -34,13 +34,7 @@ async def worker(q):
                 description = tree.xpath('//meta[@name="description"]/@content')[0].strip()
                 h1 = tree.xpath('//h1/text()')[0].strip()
                 print(u, title, description, h1)
-                await conn.execute(
-                    domain.insert().values(title=title,
-                                       description=description,
-                                       h1=h1,
-                                       url=u,
-                                       domain=url),
-                )
+
                 for link in links:
                     if not link.startswith(url):
                         continue
@@ -49,9 +43,19 @@ async def worker(q):
                     else:
                         scaned_urls.add(link)
                         await q.put(link)
+                    
+                conn.execute(
+                    domain.insert().values(title=title,
+                                           description=description,
+                                           h1=h1,
+                                           url=u,
+                                           domain=url,
+                                           link_level=depth),
+                )
+
             except Exception as e:
                 print(type(e), e)
-    await conn.close()
+            conn.close()
 
 
 async def main():
@@ -69,10 +73,12 @@ async def main():
             await qu.put(link)
     print(qu.qsize())
     tasks = []
-    for _ in range(200):
+    for _ in range(100):
         task = asyncio.Task(worker(qu))
         tasks.append(task)
     await asyncio.gather(*tasks)
 
 
-loop.run_until_complete(main())
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
