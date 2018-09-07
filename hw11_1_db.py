@@ -5,7 +5,7 @@ TABLE_NAME = 'kondyurin_crawler_asyncio'
 
 
 metadata = sa.MetaData()
-connection = {'user': 'py4seo', 'database': 'library', 'host': '46.30.164.249', 'password': 'PY1111forSEO'}
+connection = {'user': 'py4seo', 'database': 'library', 'host': '', 'password': ''}
 
 dsn = 'postgresql://{user}:{password}@{host}/{database}'.format(**connection)
 
